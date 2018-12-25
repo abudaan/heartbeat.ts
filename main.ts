@@ -1,7 +1,7 @@
-import loadMIDIFile from './loadMIDIFile';
+import loadMIDIFile, {MidiJSON} from './util/loadMIDIFile';
 
 loadMIDIFile('./data/minute_waltz.mid')
-.then(data => {
+.then((data: MidiJSON) => {
   console.log(data);
 })
-.catch(e => console.error(e));
+.catch((e:Error) => console.error(e));
