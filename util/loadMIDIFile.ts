@@ -14,11 +14,10 @@ export type MidiJSON = {
 async function loadMIDIFile (url:string) {
   return fetch(url)
   .then(status)
-  .then((response:Response) => {
-    return response.arrayBuffer()
-    .then((data): MidiJSON => {
-      return parseMidiFile(data);
-    })
+  .then(async(response:Response) => {
+    const data: ArrayBuffer = await response.arrayBuffer();
+    const midi: MidiJSON = parseMidiFile(data);
+    return midi;
   })
 }
 
