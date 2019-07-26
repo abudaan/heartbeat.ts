@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "@types/typescript": "^2.0.0",
+    "@types/webmidi": "^2.0.3",
     "jasmid.ts": "^2.1.0",
     "midifile": "^2.0.0"
   },
