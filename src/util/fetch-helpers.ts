@@ -1,6 +1,6 @@
 // fetch helpers
 
-export function status(response: Response) {
+export function status(response: Response): Promise<Response> {
   if (response.status >= 200 && response.status < 300) {
     return Promise.resolve(response)
   }
@@ -8,16 +8,16 @@ export function status(response: Response) {
 
 }
 
-export function json(response: Response) {
+export function json(response: Response): Promise<JSON> {
   return response.json()
 }
 
-export function arrayBuffer(response: Response) {
+export function arrayBuffer(response: Response): Promise<ArrayBuffer> {
   return response.arrayBuffer()
 }
 
 
-export function fetchJSON(url: string) {
+export function fetchJSON(url: string): Promise<JSON> {
   return new Promise((resolve, reject) => {
     // fetch(url, {
     //   mode: 'no-cors'
@@ -34,19 +34,9 @@ export function fetchJSON(url: string) {
   })
 }
 
-export function fetchArraybuffer(url: string) {
-  return new Promise((resolve, reject) => {
-    // fetch(url, {
-    //   mode: 'no-cors'
-    // })
-    fetch(url)
-      .then(status)
-      .then(arrayBuffer)
-      .then(data => {
-        resolve(data)
-      })
-      .catch(e => {
-        reject(e)
-      })
-  })
+export function fetchArraybuffer(url: string): Promise<ArrayBuffer> {
+  console.log('fectch ab', url);
+  return fetch(url)
+    .then(status)
+    .then(arrayBuffer);
 }

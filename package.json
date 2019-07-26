@@ -13,7 +13,7 @@
     "clean": "npm run copy && rm -rf .cache && rm -rf dist && mkdir dist && cp -R data/ dist/",
     "start": "parcel index.html",
     "help": "parcel help",
-    "tsc": "tsc --watch main.ts",
+    "tsc": "tsc --watch",
     "copy": "mkdir ./dist/data && cp ./data/* ./dist/data"
   }
 }

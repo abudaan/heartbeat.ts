@@ -17,7 +17,7 @@ export type MIDIEvent = {
   type: number
 }
 
-async function loadMIDIFile(url: string) {
+async function loadMIDIFile(url: string): Promise<MidiJSON> {
   return fetch(url)
     .then(status)
     .then(async (response: Response) => {

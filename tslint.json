@@ -1,17 +1,7 @@
 {
-  "extends": [
-    "tslint-config-airbnb",
-    "tslint-react"
-  ],
-  "linterOptions": {
-    "exclude": [
-      "**/*.jsx"
-    ]
-  },
+  "linterOptions": {},
   "rules": {
-    // allow import React from 'react'
     "import-name": false,
-    // see https://github.com/palantir/tslint-react/issues/120
     "variable-name": false,
     "function-name": false,
     "jsx-no-multiline-js": false
