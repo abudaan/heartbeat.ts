@@ -8,16 +8,12 @@ class MIDIEvent {
   get ticks() {
     return this._ticks;
   }
-  // private _data1: number;
-  get data1() {
-    return this._data1;
-  }
-  // private _data2: number;
-  get data2() {
-    return this._data2;
+  // private _data1: string[] | number[];
+  get data() {
+    return this._data;
   }
 
-  constructor(private _type: number, private _data1: number, private _data2: number, private _ticks: number) {
+  constructor(private _type: number, private _ticks: number, private _data: string | number[] | ArrayBuffer) {
 
   }
 }
