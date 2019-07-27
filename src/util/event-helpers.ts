@@ -1,11 +1,10 @@
-import { JasmidMIDIEvent, TypeMIDIEvent } from '../types';
+import { JasmidMIDIEvent } from '../types';
 import { MIDIEvent } from '../classes/MIDIEvent';
-import { MidiEvent } from '../types';
 
-const eventsToAbsoluteTicks = (events: JasmidMIDIEvent[]): TypeMIDIEvent[] => {
+const eventsToAbsoluteTicks = (events: JasmidMIDIEvent[]): MIDIEvent[] => {
   let tick = 0;
   const result = [];
-  events.forEach((e: MidiEvent) => {
+  events.forEach((e: JasmidMIDIEvent) => {
     tick += e.deltaTime;
     // console.log(tick);
     if (e.type === 'midi') {
@@ -19,11 +18,11 @@ const eventsToAbsoluteTicks = (events: JasmidMIDIEvent[]): TypeMIDIEvent[] => {
       }
     } else if (e.type === 'meta') {
       if (e.subType === 'setTempo') {
-        const bpm = 60000000 / e.microsecondsPerBeat;
+        const bpm = 60000000 / (e as any).microsecondsPerBeat;
         const m = new MIDIEvent(0x51, tick, [bpm]);
         result.push(m);
       } else if (e.subType === 'timeSignature') {
-        const m = new MIDIEvent(0x51, tick, [e.numerator, e.denominator, e.metronome, e.thirtySeconds]);
+        const m = new MIDIEvent(0x51, tick, [(e as any).numerator, (e as any).denominator, (e as any).metronome, (e as any).thirtySeconds]);
         result.push(m);
       } else if (typeof e.subType === 'undefined') {
         console.log(e);
