@@ -1,8 +1,10 @@
 {
   "dependencies": {
+    "@types/uuid": "^3.4.5",
     "@types/webmidi": "^2.0.3",
     "core-js": "^3.1.4",
-    "jasmid.ts": "^2.1.0"
+    "jasmid.ts": "^2.1.0",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@types/core-js": "^2.5.2",

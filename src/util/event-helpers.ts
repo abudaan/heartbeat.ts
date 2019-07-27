@@ -32,4 +32,11 @@ const eventsToAbsoluteTicks = (events: JasmidMIDIEvent[]): MIDIEvent[] => {
   return result;
 }
 
-export { eventsToAbsoluteTicks }
+const sortEvents = (events: MIDIEvent[]): MIDIEvent[] => {
+  return events;
+}
+
+export {
+  eventsToAbsoluteTicks,
+  sortEvents,
+};

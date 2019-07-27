@@ -1,5 +1,9 @@
+import uuidv4 from 'uuid';
 class MIDIEvent {
-
+  private _id: string;
+  get id() {
+    return this._id;
+  }
   // private _type: number;
   get type() {
     return this._type;
@@ -35,7 +39,7 @@ class MIDIEvent {
   }
 
   constructor(private _type: number, private _ticks: number, private _data: string | number[] | ArrayBuffer) {
-
+    this._id = `MIDIEvent_${uuidv4()}`;
   }
 
   mute(flag: boolean) {

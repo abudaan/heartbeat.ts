@@ -10,6 +10,10 @@ export type JasmidParsedMIDIFile = {
   tracks: JasmidMIDIEvent[][],
 };
 
+export type TypePosition = {
+  ticks: number
+}
+
 // export type TypeMIDIEvent = {
 //   data1: number;
 //   data2: number;
