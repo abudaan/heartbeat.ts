@@ -45,6 +45,28 @@ const ticksToMillis = (events: MIDIEvent[], ppq: number, playbackSpeed: number =
   let secondsPerTick = (1 / playbackSpeed * 60) / bpm / ppq;
   let millisPerTick = secondsPerTick * 1000;
 
+  let ts = performance.now();
+
+  const l = events.length;
+  for (let i = 0; i < l; i++) {
+    const e = events[i]
+    ticks = e.ticks;
+    e.millis = ticks * millisPerTick;
+
+    if (e.type === 0x51) {
+      bpm = e.data[0];
+      secondsPerTick = (1 / playbackSpeed * 60) / bpm / ppq;
+      millisPerTick = secondsPerTick * 1000;
+    }
+  };
+
+  console.log('took1', performance.now() - ts);
+
+
+
+
+  ts = performance.now();
+
   events.forEach(e => {
     ticks = e.ticks;
     e.millis = ticks * millisPerTick;
@@ -55,6 +77,8 @@ const ticksToMillis = (events: MIDIEvent[], ppq: number, playbackSpeed: number =
       millisPerTick = secondsPerTick * 1000;
     }
   })
+
+  console.log('took2', performance.now() - ts);
 
   return events;
 }
