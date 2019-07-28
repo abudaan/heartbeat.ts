@@ -17,6 +17,14 @@ class MIDIEvent {
     return this._data;
   }
 
+  private _song: string | null;
+  set song(t: string | null) {
+    this._song = t;
+  }
+  get song(): string | null {
+    return this._song;
+  }
+
   private _track: string | null;
   set track(t: string | null) {
     this._track = t;
@@ -36,6 +44,16 @@ class MIDIEvent {
   private _muted: boolean;
   get muted() {
     return this._muted;
+  }
+
+  private _removed: boolean;
+  get removed() {
+    return this._removed;
+  }
+
+  private _moved: boolean;
+  get moved() {
+    return this._moved;
   }
 
   constructor(private _type: number, private _ticks: number, private _data: string | number[] | ArrayBuffer) {

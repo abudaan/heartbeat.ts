@@ -8,6 +8,14 @@ class Song extends EventContainer {
     return this._events;
   }
 
+  private _needsUpdate: boolean = false;
+  get needsUpdate() {
+    return this._needsUpdate;
+  }
+  // set needsUpdate(flag: boolean) {
+  //   this._needsUpdate = flag;
+  // }
+
   private _tracks: { [id: string]: Track };
   constructor(name: string) {
     super(name);
@@ -24,11 +32,21 @@ class Song extends EventContainer {
     this._tracks[t.name] = t;
   }
 
-  update() {
-    Object.values(this._tracks).forEach((t) => {
-      t.update();
-    });
+  addEvents(events: MIDIEvent[]) {
+    this._events.push(...events);
+    this._needsUpdate = true;
+  }
 
+  removeEvents(events: MIDIEvent[]) {
+    // this._events.push(...events);
+    this._needsUpdate = true;
+  }
+
+  update() {
+    // Object.values(this._tracks).forEach((t) => {
+    //   t.update();
+    // });
+    // TODO sort events
   }
 
   getTrack(name: string) {

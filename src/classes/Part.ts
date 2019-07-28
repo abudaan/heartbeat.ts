@@ -8,11 +8,25 @@ import { sortEvents } from '../util/event-helpers';
 import { TypePosition } from '../types';
 
 class Part extends EventContainer {
-  private _events: MIDIEvent[] = [];
+  private events: MIDIEvent[] = [];
+  private numEvents: number = 0;
 
   private _start: TypePosition = null;
   get start() {
     return this._start;
+  }
+
+  private _end: TypePosition = null;
+  get end() {
+    return this._end;
+  }
+
+  private _song: Song | null = null;
+  get song() {
+    return this._song;
+  }
+  set song(s: Song) {
+    this._song = s;
   }
 
   private _track: Track | null = null;
@@ -26,13 +40,31 @@ class Part extends EventContainer {
   constructor(name?: string, events?: MIDIEvent[]) {
     super(name);
     if (events.length > 0) {
-      this._events.push(...events);
+      this.events.push(...events);
     }
   }
 
+  addEvents(events: MIDIEvent[]) {
+    this.events.push(...events);
+    this.numEvents = this.events.length;
+    this.update();
+    if (this._song instanceof Song) {
+      this._song.addEvents(events);
+    }
+  }
+
+  getEvents(filter?: any): MIDIEvent[] {
+    if (typeof filter === 'undefined') {
+      return this.events
+    }
+    return [];
+  }
+
   update() {
-    this._events = sortEvents(this._events);
-    this._start = { ticks: this._events[0].ticks };
+    this.events = sortEvents(this.events);
+    this._start = { ticks: this.events[0].ticks };
+    const lastEvent = this.events[this.numEvents - 1];
+    this._end = { ticks: lastEvent.ticks };
   }
 
   moveTo(position: Position, update: boolean = true) {
@@ -41,6 +73,10 @@ class Part extends EventContainer {
 
   moveEvents(events: MIDIEvent, update: boolean = true) {
 
+  }
+
+  mute(flag: boolean): void {
+    this.events.forEach(e => e.mute(flag));
   }
 }
 
