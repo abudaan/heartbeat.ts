@@ -39,14 +39,14 @@ class Part extends EventContainer {
 
   constructor(name?: string, events?: MIDIEvent[]) {
     super(name);
-    if (events.length > 0) {
+    if (events && events.length > 0) {
       this.events.push(...events);
     }
+    this.numEvents = this.events.length;
   }
 
   addEvents(events: MIDIEvent[]) {
     this.events.push(...events);
-    this.numEvents = this.events.length;
     this.update();
     if (this._song instanceof Song) {
       this._song.addEvents(events);
@@ -61,6 +61,10 @@ class Part extends EventContainer {
   }
 
   update() {
+    this.numEvents = this.events.length;
+    if (this.numEvents === 0) {
+      return;
+    }
     this.events = sortEvents(this.events);
     this._start = { ticks: this.events[0].ticks };
     const lastEvent = this.events[this.numEvents - 1];

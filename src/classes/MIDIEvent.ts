@@ -1,5 +1,8 @@
 import uuidv4 from 'uuid';
+import { TypePosition } from '../types';
 class MIDIEvent {
+  millis: number;
+
   private _id: string;
   get id() {
     return this._id;
@@ -50,10 +53,18 @@ class MIDIEvent {
   get removed() {
     return this._removed;
   }
+  set removed(flag: boolean) {
+    this._removed = flag;
+  }
 
   private _moved: boolean;
   get moved() {
     return this._moved;
+  }
+
+  private _sortIndex: number = this._ticks + this._type;
+  get sortIndex() {
+    return this._sortIndex;
   }
 
   constructor(private _type: number, private _ticks: number, private _data: string | number[] | ArrayBuffer) {
@@ -62,6 +73,16 @@ class MIDIEvent {
 
   mute(flag: boolean) {
     this._muted = flag;
+  }
+
+  move(amount: TypePosition) {
+    this._ticks += amount.ticks;
+    this._sortIndex = this._ticks + this._type;
+  }
+
+  moveTo(pos: TypePosition) {
+    this._ticks = pos.ticks;
+    this._sortIndex = this._ticks + this._type;
   }
 }
 

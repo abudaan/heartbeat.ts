@@ -1,12 +1,27 @@
 import { EventContainer } from "./EventContainer";
 import { Track } from "./Track";
 import { MIDIEvent } from "./MIDIEvent";
+import { ticksToMillis } from "../util/event-helpers";
+import { SongConfig } from "../types";
+
+
+const sortEvents = (eventA: MIDIEvent, eventB: MIDIEvent) => {
+  if (eventA.sortIndex < eventB.sortIndex) {
+    return -1;
+  }
+  if (eventA.sortIndex > eventB.sortIndex) {
+    return 1;
+  }
+  return 0;
+}
 
 class Song extends EventContainer {
-  protected _events: MIDIEvent[];
+  ppq: number;
+  protected _events: MIDIEvent[] = [];
   get events() {
     return this._events;
   }
+
 
   private _needsUpdate: boolean = false;
   get needsUpdate() {
@@ -16,9 +31,12 @@ class Song extends EventContainer {
   //   this._needsUpdate = flag;
   // }
 
-  private _tracks: { [id: string]: Track };
-  constructor(name: string) {
-    super(name);
+  private _tracks: Track[] = [];
+  constructor(config?: SongConfig) {
+    super(config.name);
+    if (config.ppq) {
+      this.ppq = config.ppq;
+    }
   }
 
   // muteTrack(name: string) {
@@ -29,7 +47,19 @@ class Song extends EventContainer {
   // }
 
   addTrack(t: Track) {
-    this._tracks[t.name] = t;
+    this._tracks.push(t);
+    this.addEvents(t.getEvents())
+    this._needsUpdate = true;
+  }
+
+  addTracks(tracks: Track[]) {
+    this._tracks.push(...tracks);
+    const events = [];
+    tracks.forEach(t => {
+      events.push(...t.getEvents());
+    });
+    this.addEvents(events);
+    this._needsUpdate = true;
   }
 
   addEvents(events: MIDIEvent[]) {
@@ -39,6 +69,7 @@ class Song extends EventContainer {
 
   removeEvents(events: MIDIEvent[]) {
     // this._events.push(...events);
+    events.forEach(e => { e.removed = true });
     this._needsUpdate = true;
   }
 
@@ -47,10 +78,14 @@ class Song extends EventContainer {
     //   t.update();
     // });
     // TODO sort events
+    this.events.filter(e => e.removed)
+    this.events.sort(sortEvents);
+    this._events = ticksToMillis(this.events, this.ppq);
+    this._needsUpdate = false;
   }
 
   getTrack(name: string) {
-    return this._tracks[name];
+    return this._tracks.filter(t => t.name === name)[0];
   }
 }
 

@@ -32,7 +32,7 @@ class Track extends EventContainer {
   constructor(name?: string, events?: MIDIEvent[]);
   constructor(name?: string, arg?: any) {
     super(name)
-    if (arg.length > 0) {
+    if (arg && arg.length > 0) {
       if (arg[0] instanceof Part) {
         // arg.forEach((p: Part) => {
         //   this.partsByName[p.name] = p;
@@ -62,6 +62,9 @@ class Track extends EventContainer {
       this.parts.push(p);
       // this.partsByName[p.name] = p;
       p.update();
+      if (this._song instanceof Song) {
+        this._song.addEvents(p.getEvents());
+      }
     })
     this.sortParts();
   }
@@ -77,6 +80,16 @@ class Track extends EventContainer {
         events.push(...p.getEvents());
       })
       this._song.removeEvents(events);
+    }
+  }
+
+  getEvents(filter?: any): MIDIEvent[] {
+    if (typeof filter === 'undefined') {
+      const events = [];
+      this.parts.forEach(p => {
+        events.push(...p.getEvents())
+      })
+      return events;
     }
   }
 

@@ -22,3 +22,8 @@ export type TypePosition = {
 //   mute: (flag: boolean) => void;
 // }
 
+
+export type SongConfig = {
+  name?: string,
+  ppq?: number,
+}
