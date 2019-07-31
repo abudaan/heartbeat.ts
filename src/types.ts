@@ -1,3 +1,5 @@
+/// <reference types="webmidi" />
+
 import { MidiEvent } from 'jasmid.ts';
 export type JasmidMIDIEvent = MidiEvent;
 
