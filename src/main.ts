@@ -1,3 +1,5 @@
+import 'jzz';
+
 import loadMIDIFile from './util/loadMIDIFile';
 import { JasmidParsedMIDIFile } from './types';
 import { eventsToAbsoluteTicks } from './util/event-helpers';

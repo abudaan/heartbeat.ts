@@ -1,3 +1,15 @@
+export type TypePortIndex = {
+  name: string,
+  id: string
+};
+export type TypePortsInventory = {
+  inputs: TypePortIndex[],
+  outputs: TypePortIndex[],
+  inputsById: { [id: string]: WebMidi.MIDIInput },
+  outputsById: { [id: string]: WebMidi.MIDIOutput },
+};
+
+
 const midiSystem = (() => {
   const inputsById = {};
   const outputsById = {};
@@ -7,7 +19,7 @@ const midiSystem = (() => {
   let midiInitialized = false;
   let midiAccess: WebMidi.MIDIAccess = null;
 
-  const init = async (): Promise<WebMidi.MIDIAccess> => {
+  const init = async (): Promise<void | WebMidi.MIDIAccess> => {
     //console.log(midiInitialized, navigator.requestMIDIAccess);
 
     if (midiInitialized === true) {
@@ -15,24 +27,25 @@ const midiSystem = (() => {
     }
     midiInitialized = true;
 
-    if (typeof navigator.requestMIDIAccess !== 'undefined') {
-      navigator.requestMIDIAccess({ sysex: false })
-        .then((midi: WebMidi.MIDIAccess) => {
-          midiAccess = midi;
-          midiAccess.onstatechange = update;
-          if (midiAccess.inputs && midiAccess.outputs) {
-            update();
-          }
-          return midi;
-        })
-        .catch(e => {
-          console.error('MIDI could not be initialized:', e);
-        })
+    if (typeof navigator.requestMIDIAccess === 'undefined') {
+      return;
     }
+
+    return navigator.requestMIDIAccess({ sysex: false })
+      .then((midi: WebMidi.MIDIAccess) => {
+        midiAccess = midi;
+        midiAccess.onstatechange = update;
+        if (midiAccess.inputs && midiAccess.outputs) {
+          update();
+        }
+        return midiAccess;
+      })
+      .catch(e => {
+        console.error('MIDI could not be initialized:', e);
+      })
   }
 
-  type TypePort = { name: string, id: string };
-  const sortPorts = (a: TypePort, b: TypePort) => {
+  const sortPorts = (a: TypePortIndex, b: TypePortIndex) => {
     const nameA = a.name.toLowerCase();
     const nameB = b.name.toLowerCase();
     if (nameA < nameB) { //sort string ascending
@@ -69,7 +82,7 @@ const midiSystem = (() => {
 
   return {
     init,
-    getPorts: () => ({
+    getPorts: (): TypePortsInventory => ({
       inputs,
       outputs,
       inputsById,
