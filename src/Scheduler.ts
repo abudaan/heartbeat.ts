@@ -1,8 +1,10 @@
 import { Song } from './classes/Song';
 import { MIDIEvent } from './classes/MIDIEvent';
 import { sequencer } from './heartbeat';
+import { animationFrameScheduler, of, timer, Observable, Scheduler, BehaviorSubject } from 'rxjs';
+import { repeat, takeUntil, takeWhile } from 'rxjs/operators';
 
-class Scheduler {
+class EventScheduler {
   private currentIndex = 0;
   private currentTime = 0;
   private maxIndex = 0;
@@ -11,7 +13,9 @@ class Scheduler {
   private timestamp = 0;
   private events: MIDIEvent[];
   private boundUpdate: () => void;
-  private animationFrame: number;
+  private animationFrame: number = null;
+  private stream$: Observable<any>;
+  private pending: BehaviorSubject<boolean>;
   get millis() {
     return this.currentTime;
   }
@@ -20,11 +24,18 @@ class Scheduler {
     private buffer: number = 50,
   ) {
     this.boundUpdate = this.update.bind(this);
+    this.pending = new BehaviorSubject<boolean>(false);
+    // this.pending.subscribe(console.log)
+    // this.stream$ = of(null, animationFrameScheduler)
+    //   .pipe(
+    //     repeat(),
+    //     takeUntil(this.pending)
+    //   )
   }
 
-  private update(cb: () => void) {
+  private update() {
     this.doLoop = true;
-    this.maxTime = this.song.millis + this.buffer;
+    this.maxTime = this.currentTime + this.buffer;
     const result = [];
     while (this.doLoop) {
       const e = this.events[this.currentIndex++];
@@ -41,14 +52,13 @@ class Scheduler {
     const now = sequencer.getTime();
     this.currentTime += now - this.timestamp;
     this.timestamp = now;
-    // console.log(this.maxTime, this.song.millis);
-    this.animationFrame = requestAnimationFrame(() => {
-      this.update(cb);
-      cb();
-    });
+    // animationFrameScheduler.schedule(this.update)
+    // this.animationFrame = requestAnimationFrame(() => {
+    //   this.update();
+    // });
   }
 
-  start(cb: () => void) {
+  start() {
     // this.timestamp = sequencer.getTime(); // milliseconds
     this.events = this.song.events;
     this.maxIndex = this.events.length;
@@ -65,19 +75,34 @@ class Scheduler {
     // }
     this.doLoop = true;
     // console.log('timestamp', this.timestamp, this.currentTime);
-    this.update(cb);
+    // this.update();
+
+    let x = 0;
+    // this.pending.next(true);
+    // this.stream$.subscribe(() => {
+    //   console.log(x++, animationFrameScheduler.now());
+    // });
+
+    this.pending.next(true);
+    of(null, animationFrameScheduler)
+      .pipe(
+        repeat(),
+        takeUntil(this.pending)
+      ).subscribe(() => {
+        console.log(x++, animationFrameScheduler.now());
+      });
   }
 
   stop() {
     this.currentTime = 0;
     this.currentIndex = 0;
-    cancelAnimationFrame(this.animationFrame);
+    // cancelAnimationFrame(this.animationFrame);
     this.animationFrame = null;
+    this.pending.next(false);
   }
 
   pause() {
-    console.log(this.animationFrame);
-    if (this.animationFrame) {
+    if (this.animationFrame !== null) {
       cancelAnimationFrame(this.animationFrame);
       this.animationFrame = null;
     } else {
@@ -86,4 +111,4 @@ class Scheduler {
   }
 }
 
-export { Scheduler };
+export { EventScheduler as Scheduler };

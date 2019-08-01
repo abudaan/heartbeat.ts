@@ -37,17 +37,17 @@ const main = async () => {
 
   btnPlay.addEventListener('click', () => {
     s.play();
-    console.log(s.millis);
+    // console.log(s.millis);
   })
 
   btnPause.addEventListener('click', () => {
     s.pause();
-    console.log(s.millis);
+    // console.log(s.millis);
   })
 
   btnStop.addEventListener('click', () => {
     s.stop();
-    console.log(s.millis);
+    // console.log(s.millis);
   })
 
   s.addEventListener('millis', (millis: number) => {
