@@ -1,9 +1,9 @@
-import { EventContainer } from "./EventContainer";
-import { Track } from "./Track";
-import { MIDIEvent } from "./MIDIEvent";
-import { ticksToMillis } from "../util/event-helpers";
-import { SongConfig } from "../types";
-
+import { EventContainer } from './EventContainer';
+import { Track } from './Track';
+import { MIDIEvent } from './MIDIEvent';
+import { ticksToMillis } from '../util/event-helpers';
+import { SongConfig } from '../types';
+import { Scheduler } from '../Scheduler';
 
 const sortEvents = (eventA: MIDIEvent, eventB: MIDIEvent) => {
   if (eventA.sortIndex < eventB.sortIndex) {
@@ -16,12 +16,18 @@ const sortEvents = (eventA: MIDIEvent, eventB: MIDIEvent) => {
 }
 
 class Song extends EventContainer {
-  ppq: number;
+  private ppq: number;
+  private scheduler: Scheduler;
+  private listeners: {} = {};
+
   protected _events: MIDIEvent[] = [];
   get events() {
     return this._events;
   }
 
+  get millis() {
+    return this.scheduler.millis;
+  }
 
   private _needsUpdate: boolean = false;
   get needsUpdate() {
@@ -37,6 +43,7 @@ class Song extends EventContainer {
     if (config.ppq) {
       this.ppq = config.ppq;
     }
+    this.scheduler = new Scheduler(this);
   }
 
   // muteTrack(name: string) {
@@ -74,6 +81,9 @@ class Song extends EventContainer {
   }
 
   update() {
+    if (this.needsUpdate === false) {
+      return;
+    }
     // Object.values(this._tracks).forEach((t) => {
     //   t.update();
     // });
@@ -86,6 +96,28 @@ class Song extends EventContainer {
 
   getTrack(name: string) {
     return this._tracks.filter(t => t.name === name)[0];
+  }
+
+  // TRANSPORT
+  play() {
+    this.update()
+    this.scheduler.start(() => {
+      if (this.listeners['millis']) {
+        this.listeners['millis'](this.millis)
+      }
+    });
+  }
+
+  pause() {
+    this.scheduler.pause();
+  }
+
+  stop() {
+    this.scheduler.stop();
+  }
+
+  addEventListener(type: string, callback: (millis: number) => void) {
+    this.listeners[type] = callback;
   }
 }
 

@@ -27,8 +27,9 @@ const sequencer = {
     const m = await midiSystem.init();
   },
   getPorts: midiSystem.getPorts,
-  audioContext,
-  unlockWebAudio: function () {
+  getTime: () => audioContext.currentTime * 1000,
+  getAudioContext: () => audioContext,
+  unlockWebAudio: () => {
     console.log('unlock webaudio');
     if (webaudioUnlocked === true) {
       console.log('already unlocked');
