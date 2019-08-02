@@ -1,7 +1,7 @@
 import { Song } from './classes/Song';
 import { MIDIEvent } from './classes/MIDIEvent';
 import { sequencer } from './heartbeat';
-import { animationFrameScheduler, of, timer, Observable, Scheduler, BehaviorSubject } from 'rxjs';
+import { animationFrameScheduler, of, timer, Observable, Scheduler, BehaviorSubject, Subscription } from 'rxjs';
 import { repeat, takeUntil, takeWhile } from 'rxjs/operators';
 
 class EventScheduler {
@@ -13,9 +13,8 @@ class EventScheduler {
   private timestamp = 0;
   private events: MIDIEvent[];
   private boundUpdate: () => void;
-  private animationFrame: number = null;
   private stream$: Observable<any>;
-  private pending: BehaviorSubject<boolean>;
+  private subscription: Subscription;
   get millis() {
     return this.currentTime;
   }
@@ -24,13 +23,10 @@ class EventScheduler {
     private buffer: number = 50,
   ) {
     this.boundUpdate = this.update.bind(this);
-    this.pending = new BehaviorSubject<boolean>(false);
-    // this.pending.subscribe(console.log)
-    // this.stream$ = of(null, animationFrameScheduler)
-    //   .pipe(
-    //     repeat(),
-    //     takeUntil(this.pending)
-    //   )
+    this.stream$ = of(null, animationFrameScheduler)
+      .pipe(
+        repeat(),
+      )
   }
 
   private update() {
@@ -51,15 +47,12 @@ class EventScheduler {
     }
     const now = sequencer.getTime();
     this.currentTime += now - this.timestamp;
+    // console.log(this.currentTime, now - this.timestamp);
     this.timestamp = now;
-    // animationFrameScheduler.schedule(this.update)
-    // this.animationFrame = requestAnimationFrame(() => {
-    //   this.update();
-    // });
   }
 
   start() {
-    // this.timestamp = sequencer.getTime(); // milliseconds
+    this.timestamp = sequencer.getTime();
     this.events = this.song.events;
     this.maxIndex = this.events.length;
     // if (typeof index === 'undefined') {
@@ -74,39 +67,20 @@ class EventScheduler {
     //   this.currentIndex = index;
     // }
     this.doLoop = true;
-    // console.log('timestamp', this.timestamp, this.currentTime);
-    // this.update();
-
-    let x = 0;
-    // this.pending.next(true);
-    // this.stream$.subscribe(() => {
-    //   console.log(x++, animationFrameScheduler.now());
-    // });
-
-    this.pending.next(true);
-    of(null, animationFrameScheduler)
-      .pipe(
-        repeat(),
-        takeUntil(this.pending)
-      ).subscribe(() => {
-        console.log(x++, animationFrameScheduler.now());
-      });
+    this.subscription = this.stream$.subscribe(this.boundUpdate);
   }
 
   stop() {
     this.currentTime = 0;
     this.currentIndex = 0;
-    // cancelAnimationFrame(this.animationFrame);
-    this.animationFrame = null;
-    this.pending.next(false);
+    this.subscription.unsubscribe();
   }
 
   pause() {
-    if (this.animationFrame !== null) {
-      cancelAnimationFrame(this.animationFrame);
-      this.animationFrame = null;
+    if (this.subscription.closed) {
+      this.subscription = this.stream$.subscribe(this.boundUpdate);
     } else {
-      this.animationFrame = requestAnimationFrame(this.boundUpdate);
+      this.subscription.unsubscribe();
     }
   }
 }
