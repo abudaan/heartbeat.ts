@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@types/core-js": "^2.5.2",
-    "parcel": "^1.12.3",
+    "parcel": "^2.8.2",
     "tslint": "^5.18.0",
     "typescript": "^3.5.3"
   },
